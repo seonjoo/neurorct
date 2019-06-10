@@ -1,10 +1,12 @@
 ---
-title: "Effect Size Computation"
+title: "Cohens d"
+author: "Seonjoo Lee"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{cohend}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r, include = FALSE}
