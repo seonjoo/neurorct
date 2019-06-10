@@ -1,0 +1,34 @@
+---
+title: "Effect Size Computation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cohend}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(neurorct)
+```
+
+## Compute Effect Size
+
+### 1. Cohen's d
+
+```{r,fig.width=6,fig.height=6}
+img.dim=c(10,12,15)
+n=10
+treatment=array(rnorm(img.dim[1]*img.dim[2]*img.dim[3]*n),dim=c(img.dim,n))
+treatment[3:5,3:5,3:5,]  <- 10+treatment[3:5,3:5,3:5,]
+control=array(rnorm(img.dim[1]*img.dim[2]*img.dim[3]*n),dim=c(img.dim,n))
+control[3:5,3:5,3:5,]  <- 12+control[3:5,3:5,3:5,]
+mask=array(0,img.dim);mask[2:8,2:11,2:14]<-1
+z=compute.cohend(imgs1=treatment,imgs2=control,mask=mask)
+```
