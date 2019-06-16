@@ -51,7 +51,8 @@ compute_cohend <- function(imgs1,imgs2,
   d.img[mask==1]<-d
   if(figure==TRUE){
     par(mfrow=c(3,5),mar=rep(0,4))
-      for (j in 1:15){
+    indeces = floor(seq(1, dim1[3], length.out = 15))
+      for (j in indeces){
         image(d.img[,,j],xaxt='n',yaxt='n',col=col,breaks=breaks)
       }
     }
