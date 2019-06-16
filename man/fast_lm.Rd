@@ -20,7 +20,7 @@ df Degree of freedome of each coefficients
 Fast lm
 }
 \details{
-This function computes linear regression and compute t-scores for multivariate outcomes.
+This function computes linear regression and computes t-scores for multivariate outcomes.
 }
 \examples{
 library(neurorct)

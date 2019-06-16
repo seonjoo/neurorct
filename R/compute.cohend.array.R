@@ -21,19 +21,19 @@
 #' @importFrom graphics image par
 #' @importFrom stats var
 #'
-compute.cohend.array <- function(imgs1,imgs2,figure=TRUE,col=bluered(200),breaks=c(-100:100)/100*7){
-  n1=dim(imgs1)[4]
-  n2=dim(imgs2)[4]
-  m1=apply(imgs1,c(1,2,3),mean)
-  m2=apply(imgs2,c(1,2,3),mean)
-  v1=apply(imgs1,c(1,2,3),var)
-  v2=apply(imgs2,c(1,2,3),var)
-  d=(m1-m2)/((v1*(n1-1) + v2*(n2-1))/(n1+n2-2))
-  if(figure==TRUE){
-    par(mfrow=c(3,4),mar=rep(0,4))
+compute.cohend.array <- function(imgs1, imgs2, figure=TRUE, col=bluered(200), breaks=c(-100:100)/100*7){
+  n1 = dim(imgs1)[4]
+  n2 = dim(imgs2)[4]
+  m1 = apply(imgs1,c(1,2,3),mean)
+  m2 = apply(imgs2,c(1,2,3),mean)
+  v1 = apply(imgs1,c(1,2,3),var)
+  v2 = apply(imgs2,c(1,2,3),var)
+  d = (m1 - m2)/((v1*(n1-1) + v2*(n2-1))/(n1+n2-2))
+  if (figure == TRUE){
+    par(mfrow = c(3,4), mar = rep(0,4))
       for (j in 1:12){
-        image(d[,,j],xaxt='n',yaxt='n',col=col,breaks=breaks)
+        image(d[,,j], xaxt='n', yaxt='n', col=col, breaks=breaks)
       }
-    }
+  }
   return(d)
 }

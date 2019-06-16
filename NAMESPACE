@@ -3,6 +3,7 @@
 export(compute.cohend)
 export(compute.cohend.array)
 export(fast_lm)
+export(generate_y)
 import(gplots)
 importFrom(graphics,image)
 importFrom(graphics,par)
