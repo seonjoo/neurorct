@@ -10,7 +10,7 @@ generate_y(n = 10)
 \item{n}{sample size in each of the two groups. There are 2*n rows in the simulated data.}
 }
 \value{
-an array
+an array of dim c(64, 64, 32, 2*n)
 }
 \description{
 Generate simulated nifti data examples

@@ -29,7 +29,7 @@
 #' @import gplots
 #' @importFrom graphics image par
 #' @importFrom stats var
-compute.cohend <- function(imgs1,imgs2,
+compute_cohend <- function(imgs1,imgs2,
                            mask=array(1,dim=dim(imgs1)[1:3]),
                            figure=TRUE,
                            col=bluered(200),
