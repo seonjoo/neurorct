@@ -9,8 +9,8 @@
 #' @examples
 #'
 generate_mask = function(img){
-  mask <- nifti_object
-  mask@.Data <- 0*nifti_object@.Data
-  mask@.Data[nifti_object@.Data > 1000] <- 1
+  mask <- img
+  mask@.Data <- 0*img@.Data
+  mask@.Data[img@.Data > 1000] <- 1
   return(mask)
 }

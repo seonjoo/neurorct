@@ -4,7 +4,7 @@
 \alias{generate_y}
 \title{Generate simulated nifti data examples}
 \usage{
-generate_y(npergroup = 10, type = "xs", saveinfti = FALSE,
+generate_y(npergroup = 10, type = c("xs", "long"), saveinfti = FALSE,
   outfile = "")
 }
 \arguments{
@@ -17,12 +17,20 @@ generate_y(npergroup = 10, type = "xs", saveinfti = FALSE,
 \item{outfile}{the name of the file where the NIfTI file is saved to.}
 }
 \value{
-an array of dim c(64, 64, 32, 2*n)
+if cross-sectional, an array of dim c(64, 64, 32, 2*npergroup); if longitudinal, a list of 2 such arrays for basline and follow-up.
 }
 \description{
 Generate simulated nifti data examples
 }
 \examples{
+library(neurorct)
+# cross-sectional data
+xs_data = generate_y(35, type = 'xs')
+
+# longitudinal data
+long_data = generate_y(20, type = 'long')
+bl = long_data$baseline
+fu = long_data$follow_up
 
 
 }
