@@ -4,7 +4,8 @@
 \alias{generate_mask}
 \title{Helper function: Generate mask nifti object}
 \usage{
-generate_mask(img, saveinfti = FALSE, file = "")
+generate_mask(img = neurorct:::template_nifti, saveinfti = FALSE,
+  file = "")
 }
 \arguments{
 \item{img}{object of class nifti to generate mask}

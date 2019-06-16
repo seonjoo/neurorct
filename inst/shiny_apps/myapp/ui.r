@@ -6,10 +6,8 @@ fluidPage(
     sidebarPanel(
       actionButton("sample", label = "Use Sample Data"),
       h3("Or use your own data"),
-      fileInput("image", label = "Upload imaging file (.nii.gz)",
-                accept = c('.nii.gz')),
-      fileInput("mask", label = "Upload Mask file (.nii.gz)",
-                accept = c('.nii.gz')),
+      fileInput("image", label = "Upload image file (.nii)"),
+      fileInput("mask", label = "Upload Mask file (.nii)"),
       fileInput("xmat", label = "Upload X_matrix data (.csv)",
                 accept = c('.csv')),
 
@@ -19,9 +17,10 @@ fluidPage(
       radioButtons("group_var", "Select grouping variable",
                    choices = c("please upload X_matrix data first")),
 
+      actionButton("run", "Run!"),
+
       h3("Output"),
       # h5("Variables"),
-      # textOutput("vars"),
       textOutput("var_names")
     ),
 

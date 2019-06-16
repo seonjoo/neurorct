@@ -4,8 +4,8 @@
 \alias{compute.cohend.array}
 \title{Computing Cohen's d from MRI images}
 \usage{
-compute.cohend.array(imgs1, imgs2, figure = TRUE, col = bluered(200),
-  breaks = c(-100:100)/100 * 7)
+\method{compute}{cohend.array}(imgs1, imgs2, figure = TRUE,
+  col = bluered(200), breaks = c(-100:100)/100 * 7)
 }
 \arguments{
 \item{imgs1}{4d image of group 1}

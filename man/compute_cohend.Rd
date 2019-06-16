@@ -5,7 +5,7 @@
 \title{Computing Cohen's d from MRI images}
 \usage{
 compute_cohend(imgs1, imgs2, mask = array(1, dim = dim(imgs1)[1:3]),
-  figure = TRUE, col = bluered(200), breaks = c(-100:100)/100 * 7)
+  figure = TRUE, col = bluered(200), breaks = c(-100:100)/100 * 2)
 }
 \arguments{
 \item{imgs1}{4d image of group 1}
