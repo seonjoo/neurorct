@@ -67,6 +67,7 @@ generate_y <- function(npergroup = 10, type = c('xs', 'long'), saveinfti = FALSE
     }
   }
 
+  # save files
   if (saveinfti == TRUE){
     if (type == 'xs'){
       y_nifti <- nifti(y)
@@ -75,7 +76,6 @@ generate_y <- function(npergroup = 10, type = c('xs', 'long'), saveinfti = FALSE
       y_nifti@bitpix <- 32
       writeNIfTI(y_nifti, file = outfile)
     }
-
     if (type == 'long'){
       y_nifti <- nifti(abind(y.base, y.fu, along = 4))
       y_nifti <- neurobase::copyNIfTIHeader(template_nifti, y_nifti)
@@ -85,6 +85,7 @@ generate_y <- function(npergroup = 10, type = c('xs', 'long'), saveinfti = FALSE
     }
   }
 
+  #
   if (type == 'xs') return(y)
   if (type == 'long') return(list(baseline = y.base, follow_up = y.fu))
 }
