@@ -2,18 +2,18 @@
 % Please edit documentation in R/generate_mask.R
 \name{generate_mask}
 \alias{generate_mask}
-\title{Generate mask nifti object}
+\title{Helper function: Generate mask nifti object}
 \usage{
-generate_mask(nifti_object)
+generate_mask(img)
 }
 \arguments{
-\item{nifti_object}{nifti template}
+\item{nifti_object}{object of class nifti to generate mask}
 }
 \value{
-a mask nifti object
+object of class nifti as mask
 }
 \description{
-Generate mask nifti object
+Helper function: Generate mask nifti object
 }
 \examples{
 

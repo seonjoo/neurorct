@@ -4,14 +4,25 @@
 \alias{generate_y}
 \title{Generate simulated nifti data examples}
 \usage{
-generate_y(n = 10)
+generate_y(npergroup = 10, type = "xs", saveinfti = FALSE,
+  outfile = "")
 }
 \arguments{
-\item{n}{sample size in each of the two groups. There are 2*n rows in the simulated data.}
+\item{npergroup}{sample size in each of the two groups. There are 2*n rows in the simulated data.}
+
+\item{type}{specify study type. 'xs': Cross-sectional; 'long':longitudinal.}
+
+\item{saveinfti}{if saveinfti = TRUE, save result to NIfTI file.}
+
+\item{outfile}{the name of the file where the NIfTI file is saved to.}
 }
 \value{
 an array of dim c(64, 64, 32, 2*n)
 }
 \description{
 Generate simulated nifti data examples
+}
+\examples{
+
+
 }
