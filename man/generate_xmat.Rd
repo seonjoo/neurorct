@@ -4,16 +4,26 @@
 \alias{generate_xmat}
 \title{Generate simulated X matrix (i.e. design matrix excluding intercept)}
 \usage{
-generate_xmat(npergroup, type = "xs")
+generate_xmat(npergroup, type = c("xs", "long"), savecsv = FALSE,
+  file = "")
 }
 \arguments{
-\item{npergroup}{sample size in each of the two groups}
+\item{npergroup}{sample size in each of the two groups.}
 
 \item{type}{specify study type. 'xs': Cross-sectional; 'long':longitudinal.}
+
+\item{savecsv}{if savecsv = TRUE, save result to csv file.}
+
+\item{outfile}{the name or connection of the file where the csv file is saved to.}
 }
 \value{
 a data.frame object of X matrix
 }
 \description{
 Generate simulated X matrix (i.e. design matrix excluding intercept)
+}
+\examples{
+library(neurorct)
+generate_xmat(npergroup = 30, type = "xs")
+
 }

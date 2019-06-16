@@ -12,3 +12,9 @@ run a Shiny app
 \description{
 Run the neurorct built-in shiny app
 }
+\examples{
+library(neurorct)
+run_shiny()
+
+
+}

@@ -42,5 +42,5 @@ treatment[3:5,3:5,3:5,]  <- 10+treatment[3:5,3:5,3:5,]
 control=array(rnorm(img.dim[1]*img.dim[2]*img.dim[3]*n),dim=c(img.dim,n))
 control[3:5,3:5,3:5,]  <- 12+control[3:5,3:5,3:5,]
 mask=array(0,img.dim);mask[2:8,2:11,2:14]<-1
-z=compute.cohend(imgs1=treatment,imgs2=control,mask=mask)
+z=compute_cohend(imgs1=treatment,imgs2=control,mask=mask)
 }

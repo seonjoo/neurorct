@@ -2,7 +2,7 @@
 #'
 #' @param npergroup sample size in each of the two groups. There are 2*n rows in the simulated data.
 #' @param saveinfti if saveinfti = TRUE, save result to NIfTI file.
-#' @param outfile the name of the file where the NIfTI file is saved to.
+#' @param outfile the name or connection of the file where the NIfTI file is saved to.
 #' @param type specify study type. 'xs': Cross-sectional; 'long':longitudinal.
 #'
 #' @return if cross-sectional, an array of dim c(64, 64, 32, 2*npergroup); if longitudinal, a list of 2 such arrays for basline and follow-up.
@@ -70,7 +70,7 @@ generate_y <- function(npergroup = 10, type = c('xs', 'long'), saveinfti = FALSE
   if (saveinfti == TRUE){
     if (type == 'xs'){
       y_nifti <- nifti(y)
-      y_nifti <- copyNIfTIHeader(template_nifti, y_nifti)
+      y_nifti <- neurobase::copyNIfTIHeader(template_nifti, y_nifti)
       datatype(y_nifti) <- 16
       y_nifti@bitpix <- 32
       writeNIfTI(y_nifti, file = outfile)
@@ -78,7 +78,7 @@ generate_y <- function(npergroup = 10, type = c('xs', 'long'), saveinfti = FALSE
 
     if (type == 'long'){
       y_nifti <- nifti(abind(y.base, y.fu, along = 4))
-      y_nifti <- copyNIfTIHeader(template_nifti, y_nifti)
+      y_nifti <- neurobase::copyNIfTIHeader(template_nifti, y_nifti)
       datatype(y_nifti) <- 16
       y_nifti@bitpix <- 32
       writeNIfTI(y_nifti, file = outfile)

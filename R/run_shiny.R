@@ -4,6 +4,10 @@
 #' @export
 #'
 #' @examples
+#' library(neurorct)
+#' run_shiny()
+#'
+#'
 run_shiny <- function() {
   appDir <- system.file("shiny_apps", "myapp", package = "neurorct")
   if (appDir == "") {

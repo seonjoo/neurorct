@@ -4,10 +4,14 @@
 \alias{generate_mask}
 \title{Helper function: Generate mask nifti object}
 \usage{
-generate_mask(img)
+generate_mask(img, saveinfti = FALSE, file = "")
 }
 \arguments{
-\item{nifti_object}{object of class nifti to generate mask}
+\item{img}{object of class nifti to generate mask}
+
+\item{saveinfti}{if saveinfti = TRUE, save result to NIfTI file.}
+
+\item{file}{the name or connection of the file where the csv file is saved to.}
 }
 \value{
 object of class nifti as mask
@@ -16,5 +20,7 @@ object of class nifti as mask
 Helper function: Generate mask nifti object
 }
 \examples{
+library(neurorct)
+
 
 }

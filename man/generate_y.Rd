@@ -14,7 +14,7 @@ generate_y(npergroup = 10, type = c("xs", "long"), saveinfti = FALSE,
 
 \item{saveinfti}{if saveinfti = TRUE, save result to NIfTI file.}
 
-\item{outfile}{the name of the file where the NIfTI file is saved to.}
+\item{outfile}{the name or connection of the file where the NIfTI file is saved to.}
 }
 \value{
 if cross-sectional, an array of dim c(64, 64, 32, 2*npergroup); if longitudinal, a list of 2 such arrays for basline and follow-up.
