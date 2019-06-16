@@ -18,7 +18,7 @@ generate_mask = function(img = neurorct:::template_nifti, saveinfti = FALSE, fil
   mask@.Data[img@.Data > 1000] <- 1
 
   if (saveinfti == TRUE) {
-    writeNIfTI(mask, file = file)
+    writeNIfTI(mask, file = file, gzipped = FALSE)
   }
 
   return(mask)

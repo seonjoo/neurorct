@@ -33,7 +33,7 @@ compute_cohend <- function(imgs1,imgs2,
                            mask=array(1,dim=dim(imgs1)[1:3]),
                            figure=TRUE,
                            col=bluered(200),
-                           breaks=c(-100:100)/100*7){
+                           breaks=c(-100:100)/100*2){
 
   dim1=dim(imgs1)
   dim2=dim(imgs2)

@@ -6,7 +6,7 @@
 #' @param col (only if figure=TRUE, default=bluered(200))
 #' @param breaks (only if figure=TRUE, default=c(-100:100)/100*7)
 #' @return cohen.dmap: image array of Cohen's d.
-#' @export
+#'
 #'
 #' @examples
 #' library(neurorct)

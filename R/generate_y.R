@@ -24,9 +24,10 @@ generate_y <- function(npergroup = 10, type = c('xs', 'long'), saveinfti = FALSE
   # generate a mask from the template nifti object
   mask = generate_mask(neurorct:::template_nifti)
   # choose a random area that has more perturb
+  set.seed(runif(1))
   arraydim = dim(template_nifti)
   lower_bound = arraydim / 6
-  width = round(arraydim / 16)
+  width = round(arraydim / 10)
   ind1 = round(lower_bound + runif(3) * arraydim * (2/3))
   ind2 = ind1 + width
   # standard deviation of area where mask = 1
@@ -74,14 +75,14 @@ generate_y <- function(npergroup = 10, type = c('xs', 'long'), saveinfti = FALSE
       y_nifti <- neurobase::copyNIfTIHeader(template_nifti, y_nifti)
       datatype(y_nifti) <- 16
       y_nifti@bitpix <- 32
-      writeNIfTI(y_nifti, file = outfile)
+      writeNIfTI(y_nifti, file = outfile, gzipped = FALSE)
     }
     if (type == 'long'){
       y_nifti <- nifti(abind(y.base, y.fu, along = 4))
       y_nifti <- neurobase::copyNIfTIHeader(template_nifti, y_nifti)
       datatype(y_nifti) <- 16
       y_nifti@bitpix <- 32
-      writeNIfTI(y_nifti, file = outfile)
+      writeNIfTI(y_nifti, file = outfile, gzipped = FALSE)
     }
   }
 
