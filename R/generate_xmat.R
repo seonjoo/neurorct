@@ -15,7 +15,7 @@
 #'
 generate_xmat = function(npergroup, type = c('xs', "long"), savecsv = FALSE, file = ""){
   type <- match.arg(type)
-  if (file == "") {
+  if (savecsv ==  TRUE & file == "") {
     stop("Please specify output file path", call. = FALSE)
   }
 
@@ -31,7 +31,7 @@ generate_xmat = function(npergroup, type = c('xs', "long"), savecsv = FALSE, fil
                       age = rep(sample(20:50, npergroup*2, replace = TRUE), 2))
   }
 
-  if (savecsv == FALSE){
+  if (savecsv == TRUE){
     try(write.csv(xmat, file))
   }
 
