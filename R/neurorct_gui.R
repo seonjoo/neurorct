@@ -5,10 +5,10 @@
 #'
 #' @examples
 #' library(neurorct)
-#' run_shiny()
+#' neurorct_gui()
 #'
 #'
-run_shiny <- function() {
+neurorct_gui <- function() {
   appDir <- system.file("shiny_apps", "myapp", package = "neurorct")
   if (appDir == "") {
     stop("Could not find example directory. Try re-installing `neurorct`.", call. = FALSE)
