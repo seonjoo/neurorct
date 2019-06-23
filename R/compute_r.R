@@ -28,7 +28,7 @@
 #' @importFrom stats var
 compute_r <- function(imgs,
                       x,
-                      mask=array(1,dim=dim(imgs1)[1:3]),
+                      mask=array(1,dim=dim(imgs)[1:3]),
                       figure=FALSE,
                       col=bluered(200),
                       breaks=c(-100:100)/100,
