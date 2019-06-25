@@ -1,0 +1,82 @@
+---
+title: "Complete Case Analysis (w package)"
+author: "Jack Yan"
+date: "6/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(neurorct)
+library(tidyverse)
+library(fslr)
+library(sas7bdat)
+```
+
+### Mask
+```{r warning = FALSE, message=FALSE}
+maskpath <- "./data-raw/MNI152_T1_2mm_brain_mask.nii.gz"
+# template <- fslsub2(maskpath, intern = TRUE)
+template <- readNIfTI(maskpath)
+template <- template@.Data
+mask <- template
+mask[mask < 0.1] = 0; mask[mask > 0.1] = 1
+# image(mask[,,17])
+# table(mask)   
+```
+
+### Extract complete-case file list using list_files()
+```{r}
+folderpath = './con_0001/' # replace this with your local folder
+filelist = list_files(folderpath)
+bl_filelist = filelist[[1]]
+fu_filelist = filelist[[2]]
+id_cc = filelist[[3]]
+```
+
+### Import imaging data for individuals with complete data (CC: Complete Case)
+```{r}
+study58_bl_CC = lapply( paste(folderpath, bl_filelist, sep=''), function(x) readNIfTI(x) ) 
+study58_fu_CC = lapply( paste(folderpath, fu_filelist, sep=''), function(x) readNIfTI(x) ) 
+```
+
+### Calculate change score for each voxel
+```{r}
+Diff.cc <- NULL
+for (i in 1:length(id_cc)){
+  Diff.cc[[i]] <- study58_fu_CC[[i]] - study58_bl_CC[[i]]
+}
+```
+
+### generate design matrix 
+```{r}
+raw_data = read.sas7bdat('voxmerged_weightmerged_edufixed.sas7bdat')
+x_matrix = 
+  raw_data %>% 
+  filter(is.na(random_group) == FALSE) %>% 
+  dplyr::select(c("subject_id",  "time_point", "random_group")) %>%
+  filter(time_point == 1) %>% 
+  filter(subject_id %in% id_cc) %>% 
+  select(-time_point, -subject_id) %>% 
+  as.matrix()
+```
+
+```{r}
+datmat_bl = do.call(cbind, lapply(study58_bl_CC, function(x) as.vector(x[mask==1])))
+datmat_diff = do.call(cbind, lapply(Diff.cc, function(x) as.vector(x[mask==1])))
+# dim(datmat_bl) = dim(datmat_diff) = c(228483, 64)
+datmat_bl[which(is.nan(datmat_bl))] = 0
+datmat_diff[which(is.nan(datmat_diff))] = 0
+```
+
+### Use fast_lm()
+```{r}
+lm_result = fast_lm(x = x_matrix, y = datmat_diff)[[1]]
+
+lm_result_bl = fast_lm(x = x_matrix, y = datmat_diff, bl = datmat_diff)[[1]]
+```
+
+
