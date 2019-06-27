@@ -27,7 +27,7 @@
 #' }
 #'
 #'
-fast_lm<-function(x,y){
+mi_lmer<-function(x,y){
 
 
     xmat=cbind(1,x)
