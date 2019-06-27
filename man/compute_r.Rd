@@ -4,7 +4,7 @@
 \alias{compute_r}
 \title{Computing Cohen's d from MRI images}
 \usage{
-compute_r(imgs, x, mask = array(1, dim = dim(imgs1)[1:3]),
+compute_r(imgs, x, mask = array(1, dim = dim(imgs)[1:3]),
   figure = FALSE, col = bluered(200), breaks = c(-100:100)/100,
   method = "pearson")
 }

@@ -27,7 +27,11 @@
 #' }
 #'
 #'
+<<<<<<< HEAD
 mi_lmer<-function(x,y){
+=======
+mi_lmer <- function(x,y){
+>>>>>>> 49cdbf5ba84d525aa893dd11b5b1fa94d27cab68
 
 
     xmat=cbind(1,x)

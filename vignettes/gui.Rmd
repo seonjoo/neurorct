@@ -1,0 +1,28 @@
+---
+title: "Neurorct_gui"
+author: "Jack Yan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cohend}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(neurorct)
+```
+
+## Using shiny GUI
+
+```{r}
+
+```
+
