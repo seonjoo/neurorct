@@ -76,7 +76,7 @@ datmat_diff[which(is.nan(datmat_diff))] = 0
 ```{r}
 lm_result = fast_lm(x = x_matrix, y = datmat_diff)[[1]]
 
-lm_result_bl = fast_lm(x = x_matrix, y = datmat_diff, bl = datmat_diff)[[1]]
+# lm_result_bl = fast_lm(x = x_matrix, y = datmat_diff, bl = datmat_diff)[[1]]
 ```
 
 

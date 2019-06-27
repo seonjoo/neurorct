@@ -4,7 +4,7 @@
 \alias{fast_lm}
 \title{Fast linear regression}
 \usage{
-fast_lm(x, y, bl = NULL)
+fast_lm(x, y, bl = NULL, ncore = 2)
 }
 \arguments{
 \item{x}{nxp input design matrix. It should not include intercept.}
@@ -12,6 +12,8 @@ fast_lm(x, y, bl = NULL)
 \item{y}{qxn outcome matrix.}
 
 \item{bl}{qxn baseline matrix.}
+
+\item{ncore}{number of clusters registered for parallel processing.}
 }
 \value{
 tmaps t-values for each coefficients
