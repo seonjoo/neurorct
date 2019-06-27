@@ -5,8 +5,8 @@
 \title{Computing Cohen's d from MRI images}
 \usage{
 compute_r(imgs, x, mask = array(1, dim = dim(imgs)[1:3]),
-  figure = FALSE, col = bluered(200), breaks = c(-100:100)/100,
-  method = "pearson")
+  col = bluered(200), breaks = c(-100:100)/100, method = "pearson",
+  adjust = FALSE)
 }
 \arguments{
 \item{imgs}{4d images}
@@ -15,13 +15,13 @@ compute_r(imgs, x, mask = array(1, dim = dim(imgs)[1:3]),
 
 \item{mask}{Mask file (default=array(1,dim=dim(imgs1)[1:3]))}
 
-\item{figure}{(default=TRUE) draw image}
-
 \item{col}{(only if figure=TRUE, default=bluered(200))}
 
 \item{breaks}{(only if figure=TRUE, default=c(-100:100)/100*7)}
 
 \item{method}{(default='pearson') 'spearman', 'tau' can be used.}
+
+\item{adjust}{(default=FALSE) compute adjusted r ()}
 }
 \value{
 rmap: image array of pearson's coefficients.
@@ -41,5 +41,5 @@ x=rnorm(n)
 img=array(rnorm(img.dim[1]*img.dim[2]*img.dim[3]*n),dim=c(img.dim,n))
 img[3:5,3:5,3:5,]  <- array(rep(x,each=27),c(3,3,3,n)) +img[3:5,3:5,3:5,]
 mask=array(0,img.dim);mask[2:8,2:11,2:14]<-1
-z=compute_r(imgs=img,x=x,mask=mask,figure=TRUE)
+z=compute_r(imgs=img,x=x,mask=mask)
 }

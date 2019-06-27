@@ -4,7 +4,7 @@
 \alias{fast_lm}
 \title{Fast linear regression}
 \usage{
-fast_lm(x, y, bl = NULL)
+fast_lm(x, y, bl = NULL, ncore = 5)
 }
 \arguments{
 \item{x}{nxp input design matrix. It should not include intercept.}
