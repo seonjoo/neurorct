@@ -86,7 +86,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/cc_w_package.html">Complete Case Analysis</a>
+    </li>
+    <li>
       <a href="../articles/cohend.html">Cohens d</a>
+    </li>
+    <li>
+      <a href="../articles/gui.html">Neurorct_gui</a>
     </li>
   </ul>
 </li>
@@ -117,7 +123,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>fast_lm</span>(<span class='no'>x</span>, <span class='no'>y</span>)</pre>
+    <pre class="usage"><span class='fu'>fast_lm</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>bl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ncore</span> <span class='kw'>=</span> <span class='fl'>2</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -130,6 +136,14 @@
       <th>y</th>
       <td><p>qxn outcome matrix.</p></td>
     </tr>
+    <tr>
+      <th>bl</th>
+      <td><p>qxn baseline matrix.</p></td>
+    </tr>
+    <tr>
+      <th>ncore</th>
+      <td><p>number of clusters registered for parallel processing.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -139,7 +153,7 @@
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function computes linear regression and compute t-scores for multivariate outcomes.</p>
+    <p>This function computes linear regression and computes t-scores for multivariate outcomes.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -147,8 +161,8 @@
 <span class='no'>y</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/matrix'>matrix</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fl'>100</span>*<span class='fl'>1000</span>),<span class='fl'>1000</span>,<span class='fl'>100</span>)
 <span class='no'>x</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>cbind</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fl'>100</span>),<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fl'>100</span>))
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='no'>a</span><span class='kw'>&lt;-</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/t'>t</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/apply'>apply</a></span>(<span class='no'>y</span>, <span class='fl'>1</span>, <span class='kw'>function</span>(<span class='no'>zz</span>)<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/summary'>summary</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/lm'>lm</a></span>(<span class='no'>zz</span>~<span class='no'>x</span>))$<span class='no'>coefficients</span>[,<span class='fl'>3</span>])))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.557   0.005   0.567 </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='no'>a2</span><span class='kw'>&lt;-</span><span class='fu'>fast_lm</span>(<span class='kw'>x</span><span class='kw'>=</span><span class='no'>x</span>,<span class='kw'>y</span><span class='kw'>=</span><span class='no'>y</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.003   0.000   0.004 </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>abs</a></span>(<span class='no'>a</span>-<span class='no'>a2</span>$<span class='no'>tmap</span>))</div><div class='output co'>#&gt; [1] 1.639985e-12</div><div class='input'>
+#&gt;   0.744   0.014   0.767 </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='no'>a2</span><span class='kw'>&lt;-</span><span class='fu'>fast_lm</span>(<span class='kw'>x</span><span class='kw'>=</span><span class='no'>x</span>,<span class='kw'>y</span><span class='kw'>=</span><span class='no'>y</span>))</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.006   0.000   0.006 </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>abs</a></span>(<span class='no'>a</span>-<span class='no'>a2</span>$<span class='no'>tmap</span>))</div><div class='output co'>#&gt; [1] 1.665255e-12</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
