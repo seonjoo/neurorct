@@ -1,82 +1,137 @@
 ---
-title: "Complete Case Analysis (w package)"
+title: "Complete Case Analysis"
 author: "Jack Yan"
-date: "6/24/2019"
-output: html_document
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cc_w_package}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+load('../data-raw/cc.RData')
 ```
 
-```{r}
+```{r, message=FALSE}
 library(neurorct)
 library(tidyverse)
 library(fslr)
-library(sas7bdat)
+
 ```
 
-### Mask
+### Import Mask
 ```{r warning = FALSE, message=FALSE}
-maskpath <- "./data-raw/MNI152_T1_2mm_brain_mask.nii.gz"
-# template <- fslsub2(maskpath, intern = TRUE)
-template <- readNIfTI(maskpath)
-template <- template@.Data
+maskpath <- "../data-raw/MNI152_T1_2mm_brain_mask.nii.gz"
+template <- fslsub2(maskpath, intern = TRUE)
+template <- template@.Data[1:40+3,1:48+3,1:34+6]
 mask <- template
 mask[mask < 0.1] = 0; mask[mask > 0.1] = 1
-# image(mask[,,17])
-# table(mask)   
 ```
 
-### Extract complete-case file list using list_files()
-```{r}
-folderpath = './con_0001/' # replace this with your local folder
+### `list_files`: Extract complete-case filelists and subject ID's
+
+The neurorct package provides a function `list_files` that recognizes the ID of patients with both baseline and follow-up imaging data. `list_files` returns a list of length 3 - baseline images, follow-up images, and ID's.
+
+```{r, eval = FALSE}
+folderpath = './con_0001/' # replace this with your local folder that contains images
 filelist = list_files(folderpath)
+
 bl_filelist = filelist[[1]]
 fu_filelist = filelist[[2]]
 id_cc = filelist[[3]]
 ```
 
-### Import imaging data for individuals with complete data (CC: Complete Case)
 ```{r}
-study58_bl_CC = lapply( paste(folderpath, bl_filelist, sep=''), function(x) readNIfTI(x) ) 
-study58_fu_CC = lapply( paste(folderpath, fu_filelist, sep=''), function(x) readNIfTI(x) ) 
+id_cc
 ```
 
-### Calculate change score for each voxel
-```{r}
-Diff.cc <- NULL
-for (i in 1:length(id_cc)){
-  Diff.cc[[i]] <- study58_fu_CC[[i]] - study58_bl_CC[[i]]
-}
+### Design matrix
+
+We can generate design matrix using the ID's above. We import the csv file of group assignment for all the subjects, including those with missing image.
+
+```{r, message = FALSE}
+group_assignment = read_csv("../data-raw/group_assignment.csv")
+head(group_assignment)
 ```
 
-### generate design matrix 
+The design matrix is made by keeping all the complete-case subjects.
+
 ```{r}
-raw_data = read.sas7bdat('voxmerged_weightmerged_edufixed.sas7bdat')
-x_matrix = 
-  raw_data %>% 
-  filter(is.na(random_group) == FALSE) %>% 
-  dplyr::select(c("subject_id",  "time_point", "random_group")) %>%
-  filter(time_point == 1) %>% 
+x_matrix = group_assignment %>% 
   filter(subject_id %in% id_cc) %>% 
-  select(-time_point, -subject_id) %>% 
+  select(random_group) %>% 
   as.matrix()
+rownames(x_matrix) = id_cc
+head(x_matrix)
+```
+
+### `import_image`: Import imaging data 
+
+The `import_image` function imports image data from the folder that contains individual imaging files. Mask can be specified using `maskpath` argument. If `complete = TRUE`, only images for complete data analysis are imported. Subsampling by factor of 2 can be done if user's local environment allows and `sub2 = TRUE`. Here we use subsampling for the sake of computation power.
+
+```{r, eval = FALSE}
+img_data <-
+  import_image(folderpath = './con_0001/',
+               maskpath = './MNI152_T1_2mm_brain_mask.nii.gz',
+               complete = TRUE,
+               sub2 = TRUE)
 ```
 
 ```{r}
-datmat_bl = do.call(cbind, lapply(study58_bl_CC, function(x) as.vector(x[mask==1])))
-datmat_diff = do.call(cbind, lapply(Diff.cc, function(x) as.vector(x[mask==1])))
-# dim(datmat_bl) = dim(datmat_diff) = c(228483, 64)
-datmat_bl[which(is.nan(datmat_bl))] = 0
-datmat_diff[which(is.nan(datmat_diff))] = 0
+datamat_bl_CC = img_data[[1]]
+datamat_fu_CC = img_data[[2]]
+dims = img_data[[3]]; dims
+dim(datamat_bl_CC)
 ```
 
-### Use fast_lm()
+The function returns baseline data and follow-up data in 2D matrices with dimensions number of voxels * number of complete-case subjects. In other words, each row in the matrix represents a subject, and each column represents a voxel. It also returns the dimensions of the original 3D image. In the above example, there are `r dim(datamat_bl_CC)[2]` subjects and `r dim(datamat_bl_CC)[1]` voxels for each subject. The data is ready for the following linear regression.
+
+### `fast_lm`: Fast linear regression 
+
+`fast_lm` can be used to conduct fast linear regression of voxel-level difference on random group assignment. The function returns regression coefficients and degrees of freedom. The following example first calculates change-score, and then does linear regression without adjusting for baseline image. `x_matrix` is the design matrix generated above.
+
 ```{r}
-lm_result = fast_lm(x = x_matrix, y = datmat_diff)[[1]]
+datmat_diff = datamat_fu_CC - datamat_bl_CC
+lm_result = fast_lm(x = x_matrix, y = datmat_diff) 
+lm_result$df
 
-# lm_result_bl = fast_lm(x = x_matrix, y = datmat_diff, bl = datmat_diff)[[1]]
+tmaps = lm_result$tmap
+tmap_group = lm_result$tmap[,2]
 ```
+
+`fast_lm` also supports adjusting for baseline image. The code is shown below. 
+
+```{r, eval = FALSE}
+bl_adjust = fast_lm(x = x_matrix, y = datmat_diff, bl = datamat_bl_CC)
+```
+
+Now we plot the 'tmap' of group assignment.
+
+```{r, message = FALSE}
+tmap_array = array(0, dim = dims[1:3])
+tmap_array[mask==1] <- tmap_group
+range(tmap_group, na.rm = T)
+```
+
+```{r, eval = FALSE}
+template = fslsub2("./con_0001/Exercise58_FLANKERS_spm8_P00058002_S0001_con_0001.hdr")
+template@.Data = tmap_array
+```
+
+```{r}
+
+maxvar = ceiling(max(abs(range(template, na.rm = TRUE))))
+
+library(gplots)
+ortho2(mask, template, col.y = bluered(200), ybreaks=c(-100:100)/100*maxvar)
+
+```
+
 
 

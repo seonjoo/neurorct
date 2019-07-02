@@ -8,6 +8,8 @@
 #' @param bl qxn baseline matrix.
 #' @param ncore number of clusters registered for parallel processing.
 #'
+#' @importFrom foreach %dopar%
+#'
 #' @return tmaps t-values for each coefficients
 #' @return df Degree of freedome of each coefficients
 #' @export
@@ -44,7 +46,7 @@ fast_lm <- function(x, y, bl = NULL, ncore = 2) {
     n = nrow(x)
     p = ncol(x) + 1
 
-    cl <- makeCluster(ncore)
+    cl <- parallel::makeCluster(ncore)
     doParallel::registerDoParallel(cl)
     tmap = foreach::foreach(i = 1:nrow(bl),
                   .combine = "rbind") %dopar% {
@@ -58,7 +60,7 @@ fast_lm <- function(x, y, bl = NULL, ncore = 2) {
                       tstats
                     } else { rep(0, p+1) }
                   }
-    stopCluster(cl)
+    parallel::stopCluster(cl)
     rownames(tmap) = c()
     df = n - p - 1 # I'm not sure about df here
     return(list(tmap = tmap, df = df))

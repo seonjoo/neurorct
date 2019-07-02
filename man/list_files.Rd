@@ -4,10 +4,12 @@
 \alias{list_files}
 \title{Generate list of files for complete case analysis}
 \usage{
-list_files(folder)
+list_files(folder, complete = TRUE)
 }
 \arguments{
 \item{folder}{folder path that contains .img and .hdr files}
+
+\item{complete}{if TRUE, return filepaths for complete-case analysis}
 }
 \value{
 list of imaging files for complete case analysis

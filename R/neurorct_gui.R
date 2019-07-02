@@ -4,8 +4,8 @@
 #' @export
 #'
 #' @examples
-#' library(neurorct)
-#' neurorct_gui()
+#' #library(neurorct)
+#' #neurorct_gui()
 #'
 #'
 neurorct_gui <- function() {
