@@ -6,6 +6,9 @@
 #' @param x nxp input design matrix. It should not include intercept.
 #' @param y qxn outcome matrix.
 #' @param bl qxn baseline matrix.
+#' @param ncore number of clusters registered for parallel processing.
+#'
+#' @importFrom foreach %dopar%
 #'
 #' @return tmaps t-values for each coefficients
 #' @return df Degree of freedome of each coefficients
@@ -19,7 +22,7 @@
 #' system.time(a2<-fast_lm(x=x,y=y))
 #' sum(abs(a-a2$tmap))
 #'
-fast_lm <- function(x, y, bl = NULL, ncore = 5) {
+fast_lm <- function(x, y, bl = NULL, ncore = 2) {
 
   if (dim(x)[1] != dim(y)[2]) error("dimension doesn't match!")
   if (!is.null(bl)) {
@@ -43,9 +46,9 @@ fast_lm <- function(x, y, bl = NULL, ncore = 5) {
     n = nrow(x)
     p = ncol(x) + 1
 
-    cl <- makeCluster(ncore)
-    registerDoParallel(cl)
-    tmap = foreach(i = 1:nrow(bl),
+    cl <- parallel::makeCluster(ncore)
+    doParallel::registerDoParallel(cl)
+    tmap = foreach::foreach(i = 1:nrow(bl),
                   .combine = "rbind") %dopar% {
                     xmat = cbind(1, x, bl[i,])
                     invxxt = try(solve(t(xmat) %*% xmat), silent = TRUE)
@@ -57,25 +60,11 @@ fast_lm <- function(x, y, bl = NULL, ncore = 5) {
                       tstats
                     } else { rep(0, p+1) }
                   }
-    stopCluster(cl)
+    parallel::stopCluster(cl)
     rownames(tmap) = c()
     df = n - p - 1 # I'm not sure about df here
     return(list(tmap = tmap, df = df))
   }
 }
 
-library("foreach")
-library("doParallel")
-cl <- makeCluster(5)
-registerDoParallel(cl)
-res = foreach(i = 1:10000,
-              .combine = "rbind") %dopar% {
 
-
-              }
-stopCluster(cl) # shut down the cluster
-
-y=matrix(rnorm(100*1000),1000,100)
-x=cbind(rnorm(100),rnorm(100))
-bl = matrix(rnorm(100*1000),1000,100)
-result = fast_lm(x, y, bl)[[1]]

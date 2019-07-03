@@ -13,8 +13,8 @@ run a Shiny app
 Run the neurorct built-in shiny app
 }
 \examples{
-library(neurorct)
-neurorct_gui()
+#library(neurorct)
+#neurorct_gui()
 
 
 }

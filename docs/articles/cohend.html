@@ -53,7 +53,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/cc_w_package.html">Complete Case Analysis</a>
+    </li>
+    <li>
       <a href="../articles/cohend.html">Cohens d</a>
+    </li>
+    <li>
+      <a href="../articles/gui.html">Neurorct_gui</a>
     </li>
   </ul>
 </li>
@@ -73,7 +79,7 @@
       <h1>Cohens d</h1>
                         <h4 class="author">Seonjoo Lee</h4>
             
-            <h4 class="date">2019-06-10</h4>
+            <h4 class="date">2019-07-02</h4>
       
       
       <div class="hidden name"><code>cohend.Rmd</code></div>
@@ -82,7 +88,10 @@
 
     
     
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(neurorct)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(neurorct)
+<span class="co">#&gt; Registered S3 method overwritten by 'R.oo':</span>
+<span class="co">#&gt;   method        from       </span>
+<span class="co">#&gt;   throw.default R.methodsS3</span></code></pre></div>
 <div id="compute-effect-size" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compute-effect-size" class="anchor"></a>Compute Effect Size</h2>
@@ -91,12 +100,12 @@
 <a href="#cohens-d" class="anchor"></a>1. Cohen’s d</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">img.dim=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">10</span>,<span class="dv">12</span>,<span class="dv">15</span>)
 n=<span class="dv">10</span>
-treatment=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/array">array</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(img.dim[<span class="dv">1</span>]*img.dim[<span class="dv">2</span>]*img.dim[<span class="dv">3</span>]*n),<span class="dt">dim=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(img.dim,n))
-treatment[<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,]  &lt;-<span class="st"> </span><span class="dv">10</span>+treatment[<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,]
-control=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/array">array</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(img.dim[<span class="dv">1</span>]*img.dim[<span class="dv">2</span>]*img.dim[<span class="dv">3</span>]*n),<span class="dt">dim=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(img.dim,n))
-control[<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,]  &lt;-<span class="st"> </span><span class="dv">12</span>+control[<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,<span class="dv">3</span>:<span class="dv">5</span>,]
-mask=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/array">array</a></span>(<span class="dv">0</span>,img.dim);mask[<span class="dv">2</span>:<span class="dv">8</span>,<span class="dv">2</span>:<span class="dv">11</span>,<span class="dv">2</span>:<span class="dv">14</span>]&lt;-<span class="dv">1</span>
-z=<span class="kw"><a href="../reference/compute.cohend.html">compute.cohend</a></span>(<span class="dt">imgs1=</span>treatment,<span class="dt">imgs2=</span>control,<span class="dt">mask=</span>mask)</code></pre></div>
+treatment=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/array">array</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(img.dim[<span class="dv">1</span>]<span class="op">*</span>img.dim[<span class="dv">2</span>]<span class="op">*</span>img.dim[<span class="dv">3</span>]<span class="op">*</span>n),<span class="dt">dim=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(img.dim,n))
+treatment[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,]  &lt;-<span class="st"> </span><span class="dv">10</span><span class="op">+</span>treatment[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,]
+control=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/array">array</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(img.dim[<span class="dv">1</span>]<span class="op">*</span>img.dim[<span class="dv">2</span>]<span class="op">*</span>img.dim[<span class="dv">3</span>]<span class="op">*</span>n),<span class="dt">dim=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(img.dim,n))
+control[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,]  &lt;-<span class="st"> </span><span class="dv">12</span><span class="op">+</span>control[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>,]
+mask=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/array">array</a></span>(<span class="dv">0</span>,img.dim);mask[<span class="dv">2</span><span class="op">:</span><span class="dv">8</span>,<span class="dv">2</span><span class="op">:</span><span class="dv">11</span>,<span class="dv">2</span><span class="op">:</span><span class="dv">14</span>]&lt;-<span class="dv">1</span>
+z=<span class="kw"><a href="../reference/compute_cohend.html">compute_cohend</a></span>(<span class="dt">imgs1=</span>treatment,<span class="dt">imgs2=</span>control,<span class="dt">mask=</span>mask)</code></pre></div>
 <p><img src="cohend_files/figure-html/unnamed-chunk-2-1.png" width="576"></p>
 </div>
 </div>

@@ -17,3 +17,14 @@ write.table(xmat, "neurorct_data/example_xmat30.csv")
 y = generate_y(npergroup = 20, saveinfti = TRUE, outfile = "neurorct_data/example_y30")
 # mask
 mask = generate_mask(neurorct:::template_nifti, saveinfti = TRUE, file = "neurorct_data/example_mask")
+
+# code to prepare group_assignment.csv
+library(tidyverse)
+raw_data = read.sas7bdat('voxmerged_weightmerged_edufixed.sas7bdat')
+tidy_data =
+  raw_data %>%
+  filter(is.na(random_group) == FALSE) %>%
+  dplyr::select(c("subject_id",  "time_point", "random_group")) %>%
+  filter(time_point == 1) %>%
+  select(-time_point)
+write_csv(tidy_data, 'group_assignment.csv')
