@@ -5,8 +5,8 @@
 #'
 #' @param x nxp input design matrix. It should not include intercept.
 #' @param y qxn outcome matrix.
-#' @param bl qxn baseline matrix.
-#' @param ncore number of clusters registered for parallel processing.
+#' @param bl (default=NULL) qxn baseline matrix.
+#' @param ncore (default=2) number of clusters registered for parallel processing.
 #'
 #' @importFrom foreach %dopar%
 #'
