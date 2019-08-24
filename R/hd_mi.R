@@ -36,50 +36,81 @@
 #' system.time(pca.mi<-hd_mi(hd.dat, hd.method='pca', mice.method='pmm'))
 
 
-hd_mi<-function(hddat,
+hd_mi <- function(hddat,
                 hd.method=c('voxelwise', 'pca'),
                 mice.method='pmm',
+                m=4,
                 seed=1,
                 mice.maxit=5,
                 mc.cores=4,
                 pca.threshold=0.8){
 
   num.voxel=nrow(hddat$img[[1]])
-  print(paste('Imaging measure dimension:',num.voxel))
-  ncov=ifelse(is.null(hddat$cov),0,ncol(as.matrix(hddat$cov)))
-  nimg=length(hddat$img)
-  if (ncov>0){if(any(is.na(hddat$cov))==TRUE){stop('Covariates include missing values.')}}
-  if (hd.method=='voxelwise'){
-    z<-mclapply(1:num.voxel, function(j){mice(cbind(hd.dat$cov, do.call(cbind,lapply(hd.dat$img, function(x)x[j,]))),
-            method=mice.method,maxit=mice.maxit,m=m,seed=seed+j)}, mc.cores=mc.cores)
-    complete<-lapply(1:m,function(k){
-      tmp=do.call(cbind,lapply(z, function(x){complete(x,k)}))
-      if(ncov==0){re=list(cov=NULL, img=lapply(1:nimg,function(idx){tmp[,1:num.voxel + (idx-1)*num.voxel]}))}
-      if(ncov>0){re=list(cov=tmp[,1:ncov], img=lapply(1:nimg,function(idx){tmp[,1:num.voxel + (idx-1)*num.voxel + ncov]}))}
-      return(re)})
-  }
-  if (hd.method=='pca'){
-    ## pca using available data
+  print(paste('Imaging measure dimension:', num.voxel))
+  ncov=ifelse(is.null(hddat$cov), 0, ncol(as.matrix(hddat$cov)))
+  nimg = length(hddat$img)
 
-    allimgdat = do.call(cbind, hddat$img)
-    miss=which(apply(allimgdat,2,function(x)any(is.na(x)==TRUE)))
-    nomiss=which(apply(allimgdat,2,function(x)any(is.na(x)==TRUE)) ==FALSE)
-    dat.m=t(scale(t(allimgdat[,nomiss]),center=TRUE,scale=FALSE))
+  if (ncov>0){if(any(is.na(hddat$cov)) == TRUE){stop('Covariates include missing values.')}}
+
+  if (hd.method == 'voxelwise') {
+    z <- mclapply(1:num.voxel,
+                  function(j){mice::mice(cbind(hddat$cov,
+                                               do.call(cbind, lapply(hddat$img, function(x) x[j,]))),
+                                         method = mice.method,
+                                         maxit = mice.maxit,
+                                         m = m,
+                                         seed = seed + j
+                                         )
+                              },
+                  mc.cores = mc.cores
+                  )
+
+    complete <-
+      lapply(1:m,
+             function(k) {
+               tmp = do.call(cbind, lapply(z, function(x){ mice::complete(x, k) }) )
+               re = lapply(1:nimg, function(idx){tmp[, (1:num.voxel)*(ncov + nimg) - nimg + idx]})
+               names(re) = c("bl", "fu")
+               return(re)}
+             )
+  }
+
+  if (hd.method == 'pca'){
+    ## pca using available data
+    allimgdat = do.call(cbind, hddat$img) # bind columns of bl and fu images
+    miss = which(apply(allimgdat, 2, function(x) any(is.na(x) == TRUE)))
+    nomiss = which(apply(allimgdat, 2, function(x)any(is.na(x) == TRUE)) == FALSE)
+    dat.m = t(scale(t(allimgdat[,nomiss]), center = TRUE, scale = FALSE))
     #varmat=svd(dat.m)
-    varmat= t(dat.m) %*% dat.m#/(length(nomiss)-1)
-    varmat.eigen=eigen(varmat)
-    ncomp=min(which(cumsum(varmat.eigen$values)/sum(varmat.eigen$values) >pca.threshold))#(ncol(dat.m)-1)
-    varmat.score=varmat.eigen$vectors[,1:ncomp] %*% diag(sqrt(varmat.eigen$values[1:ncomp]))
-    varmat.loading=dat.m %*% (varmat.eigen$vectors[,1:ncomp]) %*%
-      diag(1/sqrt(varmat.eigen$values[1:ncomp]))
-    #image(t(varmat.loading) %*% varmat.loading)
-    varmat.score.miss=matrix(NA,ncol(allimgdat),ncol(varmat.score))
-    varmat.score.miss[nomiss,]<-varmat.score
-    system.time(z<-mclapply(1:m, function(j){mice(cbind(hddat$cov,varmat.score.miss),
-            method=mice.method,maxit=mice.maxit,m=1,seed=seed+j)},mc.cores=mc.cores))
-    complete<-lapply(z,complete)
+    varmat = t(dat.m) %*% dat.m
+    varmat.eigen = eigen(varmat)
+    ncomp = min(which(cumsum(varmat.eigen$values)/sum(varmat.eigen$values) >= pca.threshold))
+    varmat.score = varmat.eigen$vectors[,1:ncomp] %*% diag(sqrt(varmat.eigen$values[1:ncomp]))
+    varmat.loading = dat.m %*% (varmat.eigen$vectors[,1:ncomp]) %*% diag(1/sqrt(varmat.eigen$values[1:ncomp]))
+    varmat.score.miss = matrix(NA, ncol(allimgdat), ncol(varmat.score))
+    varmat.score.miss[nomiss,] <- varmat.score
+    system.time(z <- mclapply(1:m,
+                              function(j){mice::mice(cbind(hddat$cov, varmat.score.miss),
+                                               method = mice.method,
+                                               maxit = mice.maxit,
+                                               m = 1,   # why is m = 1 here?
+                                               seed = seed + j)},
+                              mc.cores = mc.cores)
+                )
+
+    complete <- lapply(z, function(x){cplt = mice::complete(x)
+                                      cplt = cplt[,-1]
+                                      original = varmat.loading %*% t(cplt)
+                                      # ls = list(bl = t(original[,1:(ncol(original)/2)]), fu = t(original[,-(1:ncol(original)/2)]))
+                                      imputed_fu = t(original[,-(1:ncol(original)/2)])
+                                      fu = t(hddat$img$fu)
+                                      fu[miss - 60, ] <- imputed_fu[miss - 60, ]
+                                      ls = list(bl = t(hddat$img$bl), fu = fu)
+                                      return(ls)})
+
   }
 
   return(complete)
-
 }
+
+

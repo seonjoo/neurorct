@@ -4,9 +4,12 @@
 #' @title Fast linear regression
 #'
 #' @param x nxp input design matrix. It should not include intercept.
-#' @param y qxn outcome matrix.
+#' @param y qxn outcome matrix. q is number of voxels.
 #' @param bl (default=NULL) qxn baseline matrix.
 #' @param ncore (default=2) number of clusters registered for parallel processing.
+#' @param aggregate (default=FALSE) if TRUE, output betamap and stderrmat instead of tmap.
+#' @param hdmi_output the output of hd_mi function
+#' @param covidx (default=1) index of covariate of interest in the x matrix. Default is group if group is the first column in the x design matrix.
 #'
 #' @importFrom foreach %dopar%
 #'
@@ -22,11 +25,24 @@
 #' system.time(a2<-fast_lm(x=x,y=y))
 #' sum(abs(a-a2$tmap))
 #'
-fast_lm <- function(x, y, bl = NULL, ncore = 2) {
+fast_lm <- function(x, y = NULL, bl = NULL, ncore = 2, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
 
-  if (dim(x)[1] != dim(y)[2]) error("dimension doesn't match!")
+  if (is.null(hdmi_output) == FALSE) {
+    # compute y for each imputation
+    y = lapply(hdmi_output, function(data){t(data[[2]] - data[[1]])})
+    m = length(y)
+    # iterate fast_lm
+    results = lapply(y, function(i) {neurorct::fast_lm(x, y = i, bl, ncore, aggregate = TRUE)})
+    # compute betamap and stderrmat for aggregation
+    betamap = do.call(cbind, lapply(1:m, function(idx){results[[idx]]$betamap[,(covidx+1)]}))
+    stderrmat = do.call(cbind, lapply(1:m, function(idx){results[[idx]]$stderrmat[,(covidx+1)]}))
+    # use `aggre_mi` to return a data.frame
+    return( aggre_mi(betamap = betamap, stderrmat = stderrmat, n = nrow(y[[1]]), k = ncol(x) + !(is.null(bl))) )
+  }
+
+  if (dim(x)[1] != dim(y)[2]) stop("dimension doesn't match!")
   if (!is.null(bl)) {
-    if (ncol(bl) != ncol(y) | nrow(bl) != nrow(y)) error("dimension doesn't match! dim(bl) should equal dim(y).")
+    if (ncol(bl) != ncol(y) | nrow(bl) != nrow(y)) stop("dimension doesn't match! dim(bl) should equal dim(y).")
   }
 
   if (is.null(bl)) {
@@ -36,35 +52,54 @@ fast_lm <- function(x, y, bl = NULL, ncore = 2) {
     invxxt = solve(t(xmat) %*% xmat)
     betahat = y %*% xmat %*% invxxt
     resid = y - betahat %*% t(xmat)
-    sigmahat = as.vector(apply(resid,1,function(x)sqrt(sum(x*x)/(n - p - 1))))
+    sigmahat = as.vector(apply(resid,1,function(x) sqrt(sum(x*x)/(n-p-1))))
+    stderrmat = matrix(sigmahat) %*% matrix(diag(invxxt), ncol = ncol(invxxt)) ## Is it correct? # compare with lm results
     tstats = (1/sigmahat) * betahat %*% diag(1/sqrt(diag(invxxt)))
     df = n - p - 1
-    return(list(tmap = tstats, df = df))
   } else
-  {
-    # need to verify this code chunk
-    n = nrow(x)
+  { n = nrow(x)
     p = ncol(x) + 1
 
     cl <- parallel::makeCluster(ncore)
     doParallel::registerDoParallel(cl)
-    tmap = foreach::foreach(i = 1:nrow(bl),
-                  .combine = "rbind") %dopar% {
+    stats = foreach::foreach(i = 1:nrow(bl), .combine = "rbind") %dopar% {
                     xmat = cbind(1, x, bl[i,])
                     invxxt = try(solve(t(xmat) %*% xmat), silent = TRUE)
                     if (isTRUE(class(invxxt) != "try-error")) {
                       betahat = y[i,] %*% xmat %*% invxxt
                       resid = y[i,] - betahat %*% t(xmat)
                       sigmahat = sqrt( sum(resid*resid)/(n-p-1) )
+                      ## Is stderrmat correctly computed?
+                      stderrmat = matrix(sigmahat) %*% matrix(diag(invxxt), ncol = ncol(invxxt))
                       tstats = (1/sigmahat) * betahat %*% diag(1/sqrt(diag(invxxt)))
-                      tstats
-                    } else { rep(0, p+1) }
+                      rbind(tstats,stderrmat,betahat)
+                    } else { rep(NA, 3*(p+1)) }
                   }
     parallel::stopCluster(cl)
-    rownames(tmap) = c()
-    df = n - p - 1 # I'm not sure about df here
-    return(list(tmap = tmap, df = df))
+    v = nrow(bl) - 1
+    tstats = stats[3*(0:v) + 1, ]
+    betahat = stats[3*(0:v) + 2, ]
+    stderrmat = stats[3*(0:v) + 3, ]
+    df = n - p - 1
   }
+
+  pval = 2*(1 - pt(abs(tstats), df))
+
+  # adding column names
+  if (is.null(colnames(x))) {
+    covnames = c("intercept", paste("cov", 1:ncol(x), sep=""))
+  } else {
+    covnames = c('intercept', colnames(x))
+    if (is.null(bl) == FALSE) {covnames = c(covnames, "bl_img")}
+  }
+  colnames(tstats) = covnames
+  colnames(betahat) = covnames
+  colnames(stderrmat) = covnames
+
+  if (aggregate == TRUE) {return(list(betamap = betahat, stderrmat = stderrmat))}
+    else {return(list(maps = list(betamap = betahat[,covidx+1], tmap = tstats[,covidx+1], pmap = pval[,covidx+1]), df = df))}
+
 }
+
 
 

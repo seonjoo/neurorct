@@ -4,16 +4,23 @@
 \alias{fast_lm}
 \title{Fast linear regression}
 \usage{
-fast_lm(x, y, bl = NULL, ncore = 2)
+fast_lm(x, y = NULL, bl = NULL, ncore = 2, aggregate = FALSE,
+  hdmi_output = NULL, covidx = 1)
 }
 \arguments{
 \item{x}{nxp input design matrix. It should not include intercept.}
 
-\item{y}{qxn outcome matrix.}
+\item{y}{qxn outcome matrix. q is number of voxels.}
 
 \item{bl}{(default=NULL) qxn baseline matrix.}
 
 \item{ncore}{(default=2) number of clusters registered for parallel processing.}
+
+\item{aggregate}{(default=FALSE) if TRUE, output betamap and stderrmat instead of tmap.}
+
+\item{hdmi_output}{the output of hd_mi function}
+
+\item{covidx}{(default=1) index of covariate of interest in the x matrix. Default is group if group is the first column in the x design matrix.}
 }
 \value{
 tmaps t-values for each coefficients

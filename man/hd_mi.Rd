@@ -5,7 +5,8 @@
 \title{Generate multiple imputated datasets using MICE.}
 \usage{
 hd_mi(hddat, hd.method = c("voxelwise", "pca"), mice.method = "pmm",
-  seed = 1, mice.maxit = 5, mc.cores = 4, pca.threshold = 0.8)
+  m = 4, seed = 1, mice.maxit = 5, mc.cores = 4,
+  pca.threshold = 0.8)
 }
 \arguments{
 \item{hddat}{Data list has to follow the following format (e.g. list(cov=age, img=list(bl, fu)))
