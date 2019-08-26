@@ -3,18 +3,66 @@
 
 library(neurorct)
 library(tidyverse)
+library(foreach)
 
-y=matrix(rnorm(100*1000),1000,100)
-x=cbind(a =rnorm(100), b = rnorm(100))
-y_list = list(y,y,y)
-y = y_list
+y = matrix(rnorm(100*1000),1000,100)
+bl = matrix(rnorm(100*1000),1000,100)
+x = cbind(cov1 = rnorm(100), cov2 = rnorm(100))
 
 # test fast_lm
-library(foreach)
-a2_list <- fast_lm(x=x,y=y_list)
-a2<-fast_lm(x=x,y=y)
-a2_list[[1]]$betamap[,2]
-a2_list[[1]]$stderrmat %>% colnames()
+a1 <- fast_lm(x=x, y=y)
+a1_aggre = fast_lm(x=x, y=y, aggregate = TRUE)
+system.time(
+  a2 <- fast_lm(x=x,y=y, bl = bl)
+)
+
+a2_aggre = fast_lm(x=x, y=y,bl = bl, aggregate = TRUE)
+
+system.time(
+  re1 <-
+    lapply(1:1000,
+           function(idx){
+             lm(y ~ cov1 + cov2, data = as_tibble(cbind(y = y[idx,], x))) %>% broom::tidy() %>% .[2,]
+           }) %>%
+    do.call(rbind, .)
+)
+
+
+dist(rbind(a1$maps$betamap, re1$estimate))
+dist(rbind(a1$maps$tmap, re1$statistic))
+dist(rbind(a1$maps$pmap, re1$p.value))
+dist(rbind(a1_aggre$stderrmat[,2], re1$std.error))
+
+a1_aggre$stderrmat[,2] - re1$std.error
+a1_aggre$stderrmat[,2][1]
+re1$std.error[1]
+# sqrt(a1_aggre$stderrmat[,2][1])
+re1$std.error[1]
+a1_aggre$stderrmat[,2]
+
+re2 =
+  mclapply(1:1000,
+         function(i){
+           lm(y ~ ., data = as_tibble(cbind(y = y[i,], x, bl = bl[i,]))) %>% broom::tidy() %>% .[2,]
+         },
+         mc.cores = 5) %>%
+  do.call(rbind, .)
+
+dist(rbind(a2$maps$betamap, re2$estimate))
+
+a2$maps$betamap - re2$estimate
+dist(rbind(a2_aggre$stderrmat, re2$std.error))
+
+betahat[,2] - re2$estimate
+
+
+library(neurorct)
+y=matrix(rnorm(100*1000),1000,100)
+x=cbind(rnorm(100),rnorm(100))
+system.time(a<-t(apply(y, 1, function(zz)summary(lm(zz~x))$coefficients[,3])))
+system.time(a2<-fast_lm(x=x,y=y))
+sum(abs(a-a2$tmap))
+
 
 y=matrix(rnorm(100*1000),1000,100)
 x=cbind(a =rnorm(100), b = rnorm(100))

@@ -36,7 +36,7 @@ This function computes linear regression and computes t-scores for multivariate 
 \examples{
 library(neurorct)
 y=matrix(rnorm(100*1000),1000,100)
-x=cbind(rnorm(100),rnorm(100))
+x=cbind(cov1=rnorm(100),cov2=rnorm(100))
 system.time(a<-t(apply(y, 1, function(zz)summary(lm(zz~x))$coefficients[,3])))
 system.time(a2<-fast_lm(x=x,y=y))
 sum(abs(a-a2$tmap))
