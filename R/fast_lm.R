@@ -25,7 +25,7 @@
 #' system.time(a2<-fast_lm(x=x,y=y))
 #' sum(abs(a-a2$tmap))
 #'
-fast_lm <- function(x, y = NULL, bl = NULL, ncore = 2, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
+fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
 
   if (is.null(hdmi_output) == FALSE) {
     # compute y for each imputation
@@ -89,7 +89,7 @@ fast_lm <- function(x, y = NULL, bl = NULL, ncore = 2, aggregate = FALSE, hdmi_o
                        broom::tidy(lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,]))))[covidx+1,]
 
                        },
-                     mc.cores = 5
+                     mc.cores = ncore
                      ) %>% do.call(rbind, .)
 
 

@@ -42,7 +42,7 @@ hd_mi <- function(hddat,
                 m=4,
                 seed=1,
                 mice.maxit=5,
-                mc.cores=4,
+                mc.cores=1,
                 pca.threshold=0.8){
 
   num.voxel=nrow(hddat$img[[1]])
