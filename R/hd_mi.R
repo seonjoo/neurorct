@@ -42,7 +42,7 @@ hd_mi <- function(hddat,
                 m=4,
                 seed=1,
                 mice.maxit=5,
-                mc.cores=1,
+                mc.cores=4,
                 pca.threshold=0.8){
 
   num.voxel=nrow(hddat$img[[1]])
@@ -54,13 +54,14 @@ hd_mi <- function(hddat,
 
   if (hd.method == 'voxelwise') {
     z <- mclapply(1:num.voxel,
-                  function(j){mice::mice(cbind(hddat$cov,
+                  function(j){return(mice::mice(cbind(hddat$cov,
                                                do.call(cbind, lapply(hddat$img, function(x) x[j,]))),
                                          method = mice.method,
                                          maxit = mice.maxit,
                                          m = m,
-                                         seed = seed + j
-                                         )
+                                         seed = seed + j,
+                                         printFlag = FALSE
+                                         ))
                               },
                   mc.cores = mc.cores
                   )
@@ -94,7 +95,9 @@ hd_mi <- function(hddat,
                                                method = mice.method,
                                                maxit = mice.maxit,
                                                m = 1,   # why is m = 1 here?
-                                               seed = seed + j)},
+                                               seed = seed + j,
+                                               printFlag = FALSE
+                                               )},
                               mc.cores = mc.cores)
                 )
 

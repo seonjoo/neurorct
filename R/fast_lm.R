@@ -25,7 +25,7 @@
 #' system.time(a2<-fast_lm(x=x,y=y))
 #' sum(abs(a-a2$tmap))
 #'
-fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
+fast_lm <- function(x, y = NULL, bl = NULL, ncore = 4, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
 
   if (is.null(hdmi_output) == FALSE) {
     # compute y for each imputation
@@ -66,8 +66,8 @@ fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_o
     n = nrow(x)
     p = ncol(x) + 1
     df = n - p - 1
-    cl <- parallel::makeCluster(ncore)
-    doParallel::registerDoParallel(cl)
+    # cl <- parallel::makeCluster(ncore)
+    # doParallel::registerDoParallel(cl)
     # stats = foreach::foreach(i = 1:nrow(bl), .combine = "rbind") %dopar% {
     #
                     # xmat = cbind(1, x, bl[i,])
