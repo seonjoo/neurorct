@@ -42,7 +42,7 @@ hd_mi <- function(hddat,
                 m=4,
                 seed=1,
                 mice.maxit=5,
-                mc.cores=4,
+                mc.cores=1,
                 pca.threshold=0.8){
 
   num.voxel=nrow(hddat$img[[1]])
@@ -52,19 +52,18 @@ hd_mi <- function(hddat,
 
   if (ncov>0){if(any(is.na(hddat$cov)) == TRUE){stop('Covariates include missing values.')}}
 
+  arg.voxelwise =
+    'return(mice::mice(cbind(hddat$cov, do.call(cbind, lapply(hddat$img, function(x) x[j,]))),
+      method = mice.method,
+      maxit = mice.maxit,
+      m = m,
+      seed = seed + j,
+      printFlag = FALSE
+    ))'
+
   if (hd.method == 'voxelwise') {
-    z <- mclapply(1:num.voxel,
-                  function(j){return(mice::mice(cbind(hddat$cov,
-                                               do.call(cbind, lapply(hddat$img, function(x) x[j,]))),
-                                         method = mice.method,
-                                         maxit = mice.maxit,
-                                         m = m,
-                                         seed = seed + j,
-                                         printFlag = FALSE
-                                         ))
-                              },
-                  mc.cores = mc.cores
-                  )
+    if (mc.cores == 1){z <- lapply(1:num.voxel, function(j){eval(parse(text = arg.voxelwise))})}
+                 else {z <- mclapply(1:num.voxel, function(j){eval(parse(text = arg.voxelwise))}, mc.cores = mc.cores)}
 
     complete <-
       lapply(1:m,
@@ -90,16 +89,14 @@ hd_mi <- function(hddat,
     varmat.loading = dat.m %*% (varmat.eigen$vectors[,1:ncomp]) %*% diag(1/sqrt(varmat.eigen$values[1:ncomp]))
     varmat.score.miss = matrix(NA, ncol(allimgdat), ncol(varmat.score))
     varmat.score.miss[nomiss,] <- varmat.score
-    system.time(z <- mclapply(1:m,
-                              function(j){mice::mice(cbind(hddat$cov, varmat.score.miss),
-                                               method = mice.method,
-                                               maxit = mice.maxit,
-                                               m = 1,   # why is m = 1 here?
-                                               seed = seed + j,
-                                               printFlag = FALSE
-                                               )},
-                              mc.cores = mc.cores)
-                )
+    arg.pca = "mice::mice(cbind(hddat$cov, varmat.score.miss),
+                         method = mice.method,
+                         maxit = mice.maxit,
+                         m = 1,   # why is m = 1 here?
+                         seed = seed + j,
+                         printFlag = FALSE)"
+    if (mc.cores == 1) {z <- lapply(1:m, function(j){eval(parse(text = arg.pca))})}
+                  else {z <- mclapply(1:m, function(j){eval(parse(text = arg.pca))}, mc.cores = mc.cores)}
 
     complete <- lapply(z, function(x){cplt = mice::complete(x)
                                       cplt = cplt[,-1]

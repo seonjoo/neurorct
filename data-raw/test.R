@@ -104,7 +104,7 @@ dim(y.fu.mat)
 group=rep(c(1,0),each=npergroup)
 age=floor(runif(2*npergroup)*20)+20
 hd.dat=list(cov=age, img=list(y.base.mat, y.fu.mat))
-voxel.mi<-hd_mi(hddat = hd.dat, hd.method='voxelwise', mice.method='pmm')
+voxel.mi<-hd_mi(hddat = hd.dat, hd.method='voxelwise', mice.method='pmm', mc.cores = 1)
 voxel.mi[[1]]$img[[2]]
 
 # test feeding the output of hd_mi to fast_lm
@@ -113,10 +113,4 @@ dim(lm_mi_result)
 colnames(lm_mi_result)
 
 
-
-# a1 = mice::complete(z[[1]], 1)
-# a2 = mice::complete(z[[1]], 2)
-# a3 = mice::complete(z[[1]], 3)
-# a1 == a2
-# a2 == a3
 
