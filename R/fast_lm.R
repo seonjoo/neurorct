@@ -25,7 +25,7 @@
 #' system.time(a2<-fast_lm(x=x,y=y))
 #' sum(abs(a-a2$tmap))
 #'
-fast_lm <- function(x, y = NULL, bl = NULL, ncore = 4, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
+fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
 
   if (is.null(hdmi_output) == FALSE) {
     # compute y for each imputation
@@ -83,14 +83,17 @@ fast_lm <- function(x, y = NULL, bl = NULL, ncore = 4, aggregate = FALSE, hdmi_o
                     # tmp = broom::tidy(lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,]))))[covidx+1,]
                     # tmp
     #               }
-    # parallel::stopCluster(cl)
-    stats = parallel::mclapply(1:nrow(bl),
+    stats = lapply(1:nrow(bl),
                      function(i){
-                       broom::tidy(lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,]))))[covidx+1,]
-
-                       },
-                     mc.cores = ncore
-                     ) %>% do.call(rbind, .)
+                       # broom::tidy(lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,]))))[covidx+1,]
+                       fit = lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,])))
+                       estimate = coef(fit)[covidx+1]
+                       std.error = sqrt(vcov(fit)[covidx+1, covidx+1])
+                       statistic = estimate / std.error
+                       p.value = 2*(1-pt(abs(statistic), df))
+                       cbind(estimate, std.error, statistic, p.value)
+                       }
+                     ) %>% do.call(rbind, .) %>% as_tibble()
 
 
     # v = nrow(bl) - 1
