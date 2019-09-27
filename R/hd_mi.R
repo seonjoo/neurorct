@@ -104,7 +104,7 @@ hd_mi <- function(hddat,
                                       # ls = list(bl = t(original[,1:(ncol(original)/2)]), fu = t(original[,-(1:ncol(original)/2)]))
                                       imputed_fu = t(original[,-(1:ncol(original)/2)])
                                       fu = t(hddat$img$fu)
-                                      fu[miss - 60, ] <- imputed_fu[miss - 60, ]
+                                      fu[miss - ncol(hddat$img$bl), ] <- imputed_fu[miss - ncol(hddat$img$bl), ]
                                       ls = list(bl = t(hddat$img$bl), fu = fu)
                                       return(ls)})
 

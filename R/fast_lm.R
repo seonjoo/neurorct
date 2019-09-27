@@ -95,31 +95,11 @@ fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_o
                        }
                      ) %>% do.call(rbind, .) %>% as_tibble()
 
-
-    # v = nrow(bl) - 1
-    # tstats = stats[3*(0:v) + 1, covidx+1]
-    # betahat = stats[3*(0:v) + 2, covidx+1]
-    # stderrmat = stats[3*(0:v) + 3, covidx+1]
-    # pval = 2*(1 - pt(abs(tstats), df))
-
     tstats = stats$statistic
     betahat = stats$estimate
     stderrmat = stats$std.error
     pval = stats$p.value
   }
-
-
-
-  # adding column names
-  # if (is.null(colnames(x))) {
-  #   covnames = c("intercept", paste("cov", 1:ncol(x), sep=""))
-  # } else {
-  #   covnames = c('intercept', colnames(x))
-  #   if (is.null(bl) == FALSE) {covnames = c(covnames, "bl_img")}
-  # }
-  # colnames(tstats) = covnames
-  # colnames(betahat) = covnames
-  # colnames(stderrmat) = covnames
 
   if (aggregate == TRUE) {return(list(betamap = betahat, stderrmat = stderrmat))}
     else {return(list(maps = list(betamap = betahat, tmap = tstats, pmap = pval), df = df))}

@@ -81,7 +81,7 @@ aggre_mi(betamap = betamap, stderrmat = stderrmat)
 # test hd_mi
 library(parallel)
 m.dim=c(6,6,10)
-npergroup=30
+npergroup=60
 y.base=y.fu=array(0,c(m.dim,npergroup*2))
 eff.d=1 ## effect size
 perturb=1
@@ -103,8 +103,8 @@ y.fu.mat=array(y.fu,dim=c(m.dim[1]*m.dim[2]*m.dim[3],npergroup*2))
 dim(y.fu.mat)
 group=rep(c(1,0),each=npergroup)
 age=floor(runif(2*npergroup)*20)+20
-hd.dat=list(cov=age, img=list(y.base.mat, y.fu.mat))
-voxel.mi<-hd_mi(hddat = hd.dat, hd.method='voxelwise', mice.method='pmm', mc.cores = 1)
+hd.dat=list(cov=age, img=list(bl = y.base.mat, fu=y.fu.mat))
+voxel.mi<-hd_mi(hddat = hd.dat, hd.method='pca', mice.method='pmm', mc.cores = 1)
 voxel.mi[[1]]$img[[2]]
 
 # test feeding the output of hd_mi to fast_lm
