@@ -27,6 +27,8 @@
 #'
 fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_output = NULL, covidx = 1) {
 
+  x = cbind(x)
+
   if (is.null(hdmi_output) == FALSE) {
     # compute y for each imputation
     y = lapply(hdmi_output, function(data){t(data[[2]] - data[[1]])})
@@ -39,6 +41,7 @@ fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_o
     # use `aggre_mi` to return a data.frame
     return( aggre_mi(betamap = betamap, stderrmat = stderrmat, n = nrow(y[[1]]), k = ncol(x) + !(is.null(bl))) )
   }
+
 
   if (dim(x)[1] != dim(y)[2]) stop("dimension doesn't match!")
   if (!is.null(bl)) {
@@ -84,16 +87,22 @@ fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_o
                     # tmp
     #               }
     stats = lapply(1:nrow(bl),
-                     function(i){
-                       # broom::tidy(lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,]))))[covidx+1,]
-                       fit = lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,])))
+                   function(i){
+                     # print(i)
+                     # broom::tidy(lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,]))))[covidx+1,]
+                     fit <- try(lm(y ~ ., data = data.frame(cbind(y = y[i,], x, bl[i,]))),
+                                silent = TRUE)
+                     if (class(fit) == "try-error") {
+                       cbind(NA, NA, NA, NA)
+                     } else {
                        estimate = coef(fit)[covidx+1]
                        std.error = sqrt(vcov(fit)[covidx+1, covidx+1])
                        statistic = estimate / std.error
                        p.value = 2*(1-pt(abs(statistic), df))
                        cbind(estimate, std.error, statistic, p.value)
-                       }
-                     ) %>% do.call(rbind, .) %>% as_tibble()
+                     }
+                   }
+    ) %>% do.call(rbind, .) %>% as_tibble()
 
     tstats = stats$statistic
     betahat = stats$estimate
