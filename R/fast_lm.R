@@ -34,7 +34,12 @@ fast_lm <- function(x, y = NULL, bl = NULL, ncore = 1, aggregate = FALSE, hdmi_o
     y = lapply(hdmi_output, function(data){t(data[[2]] - data[[1]])})
     m = length(y)
     # iterate fast_lm
-    results = lapply(y, function(i) {neurorct::fast_lm(x, y = i, bl, ncore, aggregate = TRUE)})
+    if (is.null(bl)) {
+      results = lapply(1:m, function(i) {neurorct::fast_lm(x, y = y[[i]], bl = NULL, ncore, aggregate = TRUE)})
+    } else {
+      results = lapply(1:m, function(i) {neurorct::fast_lm(x, y = y[[i]], bl = t(hdmi_output[[i]][[1]]), ncore, aggregate = TRUE)})
+    }
+
     # compute betamap and stderrmat for aggregation
     betamap = do.call(cbind, lapply(1:m, function(idx){results[[idx]]$betamap}))
     stderrmat = do.call(cbind, lapply(1:m, function(idx){results[[idx]]$stderrmat}))
